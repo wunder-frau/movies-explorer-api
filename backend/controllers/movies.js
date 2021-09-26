@@ -1,6 +1,5 @@
 const Movie = require('../models/movie');
 
-const NotFoundError = require('../errors/NotFoundError');
 const ForbiddenError = require('../errors/ForbiddenError');
 const BadRequestError = require('../errors/BadRequestError');
 
@@ -40,7 +39,7 @@ const createMovie = (req, res, next) => {
     nameRU,
     nameEN,
     movieId,
-    owner: req.user._id
+    owner: req.user._id,
   })
     .then((movie) => {
       res.status(200).send(movie);

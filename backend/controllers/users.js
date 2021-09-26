@@ -6,7 +6,7 @@ const NotFoundError = require('../errors/NotFoundError');
 const ConflictError = require('../errors/ConflictError');
 const BadRequestError = require('../errors/BadRequestError');
 const UnauthorizedError = require('../errors/UnauthorizedError');
-// getUser, updateUser 
+
 const { NODE_ENV, JWT_SECRET } = process.env;
 
 const getUsers = (req, res, next) => {
@@ -91,7 +91,6 @@ const updateUser = (req, res, next) => {
     });
 };
 
-
 const login = (req, res, next) => {
   const { email, password } = req.body;
 
@@ -119,6 +118,11 @@ const login = (req, res, next) => {
     });
 };
 
+const logout = (req, res, next) => {
+  res.clearCookie('jwt').send({ message: 'JWT удалено из куки' });
+  next();
+};
+
 module.exports = {
   getUsers,
   getUserId,
@@ -126,4 +130,5 @@ module.exports = {
   createUser,
   updateUser,
   login,
+  logout,
 };

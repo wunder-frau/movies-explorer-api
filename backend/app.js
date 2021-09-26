@@ -9,11 +9,11 @@ const rateLimit = require('express-rate-limit');
 
 const movieRouter = require('./routes/movies');
 const userRouter = require('./routes/users');
-const authRouter = require('./routes/auth');
-const notFoundErrorRouter = require('./routes/notFoundError');
-//const { authValid, loginValid } = require('./middlewares/validation');
 
-//const { login, createUser } = require('./controllers/users');
+const notFoundErrorRouter = require('./routes/notFoundError');
+const { authValid, loginValid } = require('./middlewares/validation');
+
+const { login, logout, createUser } = require('./controllers/users');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const Auth = require('./middlewares/auth');
 const errorsHandler = require('./middlewares/errorsHandler');
@@ -38,7 +38,7 @@ mongoose.connect('mongodb://localhost:27017/moviesdb', {
 app.use(cors({
   credentials: true,
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-  origin: 'https://wunder-frau.nomoredomains.club',
+  origin: '*',
   optionsSuccessStatus: 204,
   preflightContinue: false,
 }));
@@ -56,15 +56,15 @@ app.get('/crash-test', () => {
   }, 0);
 });
 
-//app.post('/signin', loginValid, login);
+app.post('/signup', authValid, createUser);
 
-//app.post('/signup', authValid, createUser);
+app.post('/signin', loginValid, login);
+
+app.post('/signout', logout);
 
 app.use(Auth);
 app.use('/', movieRouter);
 app.use('/', userRouter);
-app.use('/', authRouter); 
-
 
 app.all('*', notFoundErrorRouter);
 app.disable('x-powered-by');
