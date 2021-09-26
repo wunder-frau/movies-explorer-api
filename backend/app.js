@@ -11,11 +11,11 @@ const movieRouter = require('./routes/movies');
 const userRouter = require('./routes/users');
 const authRouter = require('./routes/auth');
 const notFoundErrorRouter = require('./routes/notFoundError');
-const { createUserValid, loginValid } = require('./middlewares/validation');
+const { authValid, loginValid } = require('./middlewares/validation');
 
 const { login, createUser } = require('./controllers/users');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
-const auth = require('./middlewares/auth');
+const Auth = require('./middlewares/auth');
 const errorsHandler = require('./middlewares/errorsHandler');
 
 const app = express();
@@ -56,14 +56,15 @@ app.get('/crash-test', () => {
   }, 0);
 });
 
-app.post('/signin', loginValid, login);
+//app.post('/signin', loginValid, login);
 
-app.post('/signup', createUserValid, createUser);
+//app.post('/signup', authValid, createUser);
 
-app.use(auth);
+app.use(Auth);
 app.use('/', movieRouter);
 app.use('/', userRouter);
 app.use('/', authRouter); 
+
 
 app.all('*', notFoundErrorRouter);
 app.disable('x-powered-by');
