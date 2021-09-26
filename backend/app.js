@@ -11,9 +11,9 @@ const movieRouter = require('./routes/movies');
 const userRouter = require('./routes/users');
 const authRouter = require('./routes/auth');
 const notFoundErrorRouter = require('./routes/notFoundError');
-const { authValid, loginValid } = require('./middlewares/validation');
+//const { authValid, loginValid } = require('./middlewares/validation');
 
-const { login, createUser } = require('./controllers/users');
+//const { login, createUser } = require('./controllers/users');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const Auth = require('./middlewares/auth');
 const errorsHandler = require('./middlewares/errorsHandler');

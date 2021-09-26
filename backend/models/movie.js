@@ -68,7 +68,7 @@ const cardSchema = new mongoose.Schema({
     minlength: 2,
     maxlength: 30,
   },
-  nameEn: {
+  nameEN: {
     type: String,
     required: true,
     minlength: 2,
