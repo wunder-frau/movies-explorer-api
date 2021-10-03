@@ -1,7 +1,10 @@
 const Movie = require('../models/movie');
 
 const ForbiddenError = require('../errors/ForbiddenError');
+const NotFoundError = require('../errors/NotFoundError');
 const BadRequestError = require('../errors/BadRequestError');
+
+const { FORBIDDEN, NOT_FOUND } = require('../utils/error_messages');
 
 const getMovies = (req, res, next) => {
   Movie.find({})
@@ -55,8 +58,11 @@ const deleteMovie = (req, res, next) => {
   Movie.findById(req.params.movieId)
 
     .then((movie) => {
+      if (!movie) {
+        throw new NotFoundError(NOT_FOUND);
+      }
       if (movie.owner.toString() !== req.user._id) {
-        throw new ForbiddenError(`Вы не можете удалить фильм, добавленный не вами. ${movie.owner.toString()}, ${req.user._id}`);
+        throw new ForbiddenError(FORBIDDEN);
       } else {
         Movie.findByIdAndDelete(req.params.movieId)
           .then((data) => {

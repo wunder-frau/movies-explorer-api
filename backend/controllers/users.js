@@ -7,7 +7,15 @@ const ConflictError = require('../errors/ConflictError');
 const BadRequestError = require('../errors/BadRequestError');
 const UnauthorizedError = require('../errors/UnauthorizedError');
 
-const { NODE_ENV, JWT_SECRET } = process.env;
+const { JWT_SECRET } = require('../utils/config');
+const {
+  OK,
+  NOT_FOUND,
+  BAD_REQUEST,
+  CONFLICT,
+  INVALID_CREDENTIALS,
+  UNAUTHORIZED,
+} = require('../utils/error_messages');
 
 const getUsers = (req, res, next) => {
   User.find({})
@@ -24,7 +32,7 @@ const getUserId = (req, res, next) => {
 
     .then((_id) => res.send({ data: _id }))
     .catch(() => {
-      throw new NotFoundError('Пользователь по указанному _id не найден.');
+      throw new NotFoundError(NOT_FOUND);
     })
     .catch(next);
 };
@@ -34,7 +42,7 @@ const getUser = (req, res, next) => {
     .then((user) => { res.status(200).send(user); })
     .catch((error) => {
       if (error.name === 'CastError') {
-        next(new BadRequestError('Переданы некорректные данные.'));
+        next(new BadRequestError(BAD_REQUEST));
       } else {
         next(error);
       }
@@ -50,7 +58,7 @@ const createUser = (req, res, next) => {
 
   User.findOne({ email }).then((data) => {
     if (data) {
-      throw new ConflictError('Email уже существует');
+      throw new ConflictError(CONFLICT);
     }
     bcrypt.hash(password, 10)
       .then((hash) => User.create({
@@ -79,12 +87,12 @@ const updateUser = (req, res, next) => {
     { email, name },
     { new: true, runValidators: true },
   )
-    .orFail(() => next(new NotFoundError('Пользователь по указанному _id не найден.')))
+    .orFail(() => next(new NotFoundError(NOT_FOUND)))
 
     .then((user) => res.send({ data: user }))
     .catch((error) => {
       if (error.name === 'ValidationError') {
-        next(new BadRequestError('Переданы некорректные данные при обновлении профиля.'));
+        next(new BadRequestError(BAD_REQUEST));
       } else {
         next(error);
       }
@@ -98,7 +106,7 @@ const login = (req, res, next) => {
     .then((user) => {
       const token = jwt.sign(
         { _id: user._id },
-        NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
+        JWT_SECRET,
         { expiresIn: '7d' },
       );
       res
@@ -107,11 +115,11 @@ const login = (req, res, next) => {
           httpOnly: true,
           sameSite: true,
         })
-        .send({ message: 'Авторизация прошла успешно', token });
+        .send({ OK, token });
     })
     .catch((error) => {
-      if (error.message === 'Неправильные почта или пароль') {
-        next(new UnauthorizedError('Указан некорректный Email или пароль.'));
+      if (error.message === INVALID_CREDENTIALS) {
+        next(new UnauthorizedError(UNAUTHORIZED));
       } else {
         next(error);
       }

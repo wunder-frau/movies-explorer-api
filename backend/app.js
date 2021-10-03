@@ -5,30 +5,21 @@ const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
 const { errors } = require('celebrate');
 const cors = require('cors');
-const rateLimit = require('express-rate-limit');
-
-const movieRouter = require('./routes/movies');
-const userRouter = require('./routes/users');
-
-const notFoundErrorRouter = require('./routes/notFoundError');
-const { authValid, loginValid } = require('./middlewares/validation');
-
-const { login, logout, createUser } = require('./controllers/users');
+const limiter = require('./utils/limiter');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
-const Auth = require('./middlewares/auth');
 const errorsHandler = require('./middlewares/errorsHandler');
+const { MONGO_DB } = require('./utils/config');
+const router = require('./routes/index');
 
 const app = express();
+
 require('dotenv').config();
 
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
-});
+app.use(limiter);
 
 const { PORT = 5000 } = process.env;
 
-mongoose.connect('mongodb://localhost:27017/moviesdb', {
+mongoose.connect(MONGO_DB, {
   useNewUrlParser: true,
   useCreateIndex: true,
   useFindAndModify: false,
@@ -56,25 +47,11 @@ app.get('/crash-test', () => {
   }, 0);
 });
 
-app.post('/signup', authValid, createUser);
-
-app.post('/signin', loginValid, login);
-
-app.post('/signout', logout);
-
-app.use(Auth);
-app.use('/', movieRouter);
-app.use('/', userRouter);
-
-app.all('*', notFoundErrorRouter);
-app.disable('x-powered-by');
+app.use(router);
 
 app.use(errorLogger);
 app.use(errors());
 
 app.use(errorsHandler);
 
-app.listen(PORT, () => {
-  // eslint-disable-next-line no-console
-  console.log(`App listening on port ${PORT}`);
-});
+app.listen(PORT);
