@@ -1,0 +1,21 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Dependency directory
+node_modules/
+package-lock.json
+
+# Build directory
+
+# Optional npm cache directory
+.npm
+frontend/build
+
+# Optional REPL history
+.DS_Store
+.idea
+.vscode
+
+.env
