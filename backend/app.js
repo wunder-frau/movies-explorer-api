@@ -15,8 +15,6 @@ const app = express();
 
 require('dotenv').config();
 
-app.use(limiter);
-
 const { PORT = 5000 } = process.env;
 
 mongoose.connect(MONGO_DB, {
