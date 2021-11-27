@@ -27,7 +27,7 @@ mongoose.connect(MONGO_DB, {
 app.use(cors({
   credentials: true,
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-  origin: '*',
+  origin: 'https://api.wunder.movies.nomoredomains.club',
   optionsSuccessStatus: 204,
   preflightContinue: false,
 }));
